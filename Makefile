@@ -1,6 +1,6 @@
 include Makefile.mk
 
-NAME=cfn-custom-provider
+NAME=cfn-ebs-default-encryption
 S3_BUCKET_PREFIX=binxio-public
 AWS_REGION=eu-central-1
 ALL_REGIONS=$(shell printf "import boto3\nprint('\\\n'.join(map(lambda r: r['RegionName'], boto3.client('ec2').describe_regions()['Regions'])))\n" | python | grep -v '^$(AWS_REGION)$$')
@@ -52,7 +52,7 @@ do-push: deploy
 
 do-build: target/$(NAME)-$(VERSION).zip
 
-target/$(NAME)-$(VERSION).zip: src/*.py requirements.txt
+target/$(NAME)-$(VERSION).zip: src/*.js package-lock.json
 	mkdir -p target/content
 	docker build --build-arg ZIPFILE=$(NAME)-$(VERSION).zip -t $(NAME)-lambda:$(VERSION) -f Dockerfile.lambda . && \
 		ID=$$(docker create $(NAME)-lambda:$(VERSION) /bin/true) && \
@@ -63,13 +63,12 @@ target/$(NAME)-$(VERSION).zip: src/*.py requirements.txt
 clean:
 	rm -rf target src/*.pyc tests/*.pyc
 
-Pipfile.lock: Pipfile requirements.txt test-requirements.txt
-	pipenv install -r requirements.txt
-	pipenv install -d -r test-requirements.txt
+package-lock.json: package.json
+	npm install
 
-test: Pipfile.lock
+test: package-lock.json
 	for n in ./cloudformation/*.yaml ; do aws cloudformation validate-template --template-body file://$$n ; done
-	PYTHONPATH=$(PWD)/src pipenv run pytest ./tests/test*.py
+	npm run test
 
 fmt:
 	black src/*.py tests/*.py

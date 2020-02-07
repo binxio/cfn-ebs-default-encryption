@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Custom Provider CloudFormation
+Description: Enable EBS Default Encryption
 Resources:
-  Custom:
-    Type: Custom::Custom
+  EbsDefaultEncryption:
+    Type: Custom::EbsDefaultEncryption
     Properties:
-      Value: bye bye World!
-      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cfn-custom-provider'
+      KmsKeyId: "aws/ebs"  # defaults to "aws/ebs" if not set
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cfn-ebs-default-encryption-provider'
 Outputs:
   Value:
-    Description: The value returned by the Custom::Custom resource
+    Description: The value returned by the Custom::EbsDefaultEncryption resource
     Value: !GetAtt 'Custom.Value'

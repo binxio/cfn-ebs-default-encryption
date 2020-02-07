@@ -1,25 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Custom CloudFormation Provider
 Parameters:
-  AppVPC:
-    Type: String
-    Default: ''
-  PrivateSubnets:
-    Type: CommaDelimitedList
-    Default: ''
-  DefaultSecurityGroup:
-    Type: String
-    Default: ''
   S3BucketPrefix:
     Type: String
     Default: ''
   CFNCustomProviderZipFileName:
     Type: String
-    Default: lambdas/cfn-custom-provider-latest.zip
-Conditions:
-  DoNotAttachToVpc: !Equals
-    - !Ref 'AppVPC'
-    - ''
+    Default: lambdas/cfn-ebs-default-encryption-latest.zip
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
@@ -50,7 +37,16 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+      Policies:
+        - PolicyName: kmsReadInline
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'kms:DescribeKey'
+                Resource: '*'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -65,18 +61,13 @@ Resources:
     DependsOn:
       - LambdaRole
     Properties:
-      Description: Custom CloudFormation Provider implementation
+      Description: EBS Default Encryption Custom Resource Provider
       Code:
         S3Bucket: !Sub '${S3BucketPrefix}-${AWS::Region}'
         S3Key: !Ref 'CFNCustomProviderZipFileName'
-      FunctionName: cfn-custom-provider
-      Handler: provider.handler
+      FunctionName: cfn-ebs-default-encryption-provider
+      Handler: index.handler
+      Timeout: 120
       MemorySize: 128
       Role: !GetAtt 'LambdaRole.Arn'
-      VpcConfig: !If
-        - DoNotAttachToVpc
-        - !Ref 'AWS::NoValue'
-        - SecurityGroupIds:
-            - !Ref 'DefaultSecurityGroup'
-          SubnetIds: !Ref 'PrivateSubnets'
-      Runtime: python2.7
+      Runtime: nodejs12.x

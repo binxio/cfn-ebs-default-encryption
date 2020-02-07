@@ -1,5 +1,12 @@
 # cfn-custom-provider-template
-A template source directory for creating custom CloudFormation Providers.
+
+Custom CloudFormation resource to enable "Default Encryption for New EBS Volumes".
+
+Please refer to the links below to lean the features (more secure) and limitations this provides.
+
+- https://aws.amazon.com/blogs/aws/new-opt-in-to-default-encryption-for-new-ebs-volumes/
+- https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html
+
 
 After cloning this directory you have to following make targets at your command:
 
