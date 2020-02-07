@@ -6,7 +6,3 @@ Resources:
     Properties:
       KmsKeyId: "aws/ebs"  # defaults to "aws/ebs" if not set
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cfn-ebs-default-encryption-provider'
-Outputs:
-  Value:
-    Description: The value returned by the Custom::EbsDefaultEncryption resource
-    Value: !GetAtt 'Custom.Value'
