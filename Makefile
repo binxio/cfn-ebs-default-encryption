@@ -61,7 +61,7 @@ target/$(NAME)-$(VERSION).zip: src/*.js package-lock.json
 		chmod ugo+r target/$(NAME)-$(VERSION).zip
 
 clean:
-	rm -rf target src/*.pyc tests/*.pyc
+	rm -rf target node_modules
 
 package-lock.json: package.json
 	npm install
