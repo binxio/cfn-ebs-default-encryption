@@ -1,4 +1,6 @@
-# cfn-custom-provider-template
+deprecated Nov 2024 
+
+# cfn-ebs-default-encryption-provider
 
 Custom CloudFormation resource to enable "Default Encryption for New EBS Volumes".
 
